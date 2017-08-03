@@ -1,19 +1,1435 @@
-"use strict";angular.module("logicToolsApp",["ui.router"]).config(function(t,l){l.otherwise("/"),t.state("main",{url:"/",templateUrl:"templates/main.html",controller:"MainCtrl as main"}).state("truthTables",{url:"/truth-tables",templateUrl:"templates/truth-table.html",controller:"TruthTableCtrl as table"}).state("fitchSystems",{url:"/fitch",templateUrl:"templates/fitch.html",controller:"FitchCtrl as fitch"})});
-"use strict";angular.module("logicToolsApp").controller("FitchCtrl",function(e,t,i,s,r,n,h,c,o){function u(){this.marginLeft=20,this.premise="",this.premiseGraph=i["new"](),this.selected=[],this.showDisjoinField=!1,this.structure=e["new"](),this.valueToDisjoin=""}function p(e,t){this.structure.entail(e),g(this.premiseGraph,e,t)}function a(e,t){_.forEach(e,function(e){p.call(this,e,t)}.bind(this))}function l(e){return _.filter(e,"checked")}function m(e,t){var i=_.map(t,"id");return l(e).filter(function(e){return-1!==i.indexOf(e.scopeId)})}function d(e,t){return t.length=0,_.map(e,function(e){return e.checked=!1,e})}function f(e){var t,i;return t=_.filter(e,function(e){return e.isOr(e.digest())}),1!==t.length?null:(i=_.filter(e,function(e){return e.isImplication(e.digest())}),i.length!==e.length-1?null:{disjunctions:t,implications:i})}function g(e,t,i){_.forEach(i,function(i){e.appendChildNode(i,t)})}u.call(this),this.assume=function(){var e,i;i=t["new"]({value:this.premise}),o.validate(i)&&(this.structure.openScope(i),e=this.structure.getCurrentScope(),i.scopeId=e.id,i.scopeLayer=e.layer,this.premiseGraph.appendNode(i),this.premise="")},this.refresh=function(){u.call(this)},this.closeDisjoinField=function(){this.showDisjoinField=!1,this.valueToDisjoin=""},this.disjoinPremise=function(){var e,t,i;t=this.structure.getCurrentScope(),i=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),i.length&&this.valueToDisjoin&&(e=n.introduction(this.valueToDisjoin,i,t),this.showDisjoinField=!1,this.valueToDisjoin="",e&&a.call(this,e,i))},this.andIntroduction=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),e.length<2||(t=r.introduction(e,i),t&&a.call(this,t,e))},this.andElimination=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),1===e.length&&(t=r.elimination(e[0],i),t&&a.call(this,t,e))},this.negationIntro=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),2===e.length&&(t=c.introduction(e[0],e[1],i),t&&p.call(this,t,e))},this.negationElim=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),e.length>1||(t=c.elimination(e[0],i),t&&p.call(this,t,e))},this.implicationIntro=function(){var e,t,i;e=this.structure.closeScope(),t=this.structure.getCurrentScope(),i=h.introduction(t,e),p.call(this,i,[e.head,e.last]),d(this.premiseGraph.premises,this.selected)},this.implicationElim=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),2===e.length&&(t=h.elimination(e[0],e[1],i),t&&p.call(this,t,e))},this.orElimination=function(){var e,t,i,s;t=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),e.length<3||(s=f(e),s&&(i=n.elimination(s,t),i&&p.call(this,i,s)))},this.orIntroduction=function(){this.showDisjoinField=!0},this.reiterate=function(){var e,i,s;i=this.structure.getCurrentScope(),s=m(this.premiseGraph.premises,this.structure.scopes),e=s.map(function(e,s){return t["new"]({scopeLayer:i.layer,scopeId:i.id,value:e.value})}),_.forEach(e,function(e){p.call(this,e,s)}.bind(this)),d(this.premiseGraph.premises,this.selected)},this["delete"]=function(){var e,t;e=l(this.premiseGraph.premises),_.forEach(e,function(e){this.premiseGraph.removeNode(e)}.bind(this)),t=_.map(this.premiseGraph.premises,"scopeId"),this.structure.reset(this.premiseGraph.premises)},this.biconditionalIntro=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),2===e.length&&(t=s.introduction(e,i),t&&a.call(this,t,e))},this.biconditionalElim=function(){var e,t,i;i=this.structure.getCurrentScope(),e=m(this.premiseGraph.premises,this.structure.scopes),d(this.premiseGraph.premises,this.selected),1===e.length&&(t=s.elimination(e[0],i),t&&a.call(this,t,e))}});
-"use strict";angular.module("logicToolsApp").controller("MainCtrl",function(t){this.goToTruth=function(){t.path("/truth-tables")},this.goToFitch=function(){t.path("/fitch")}});
-"use strict";angular.module("logicToolsApp").controller("MenuCtrl",function(){});
-"use strict";angular.module("logicToolsApp").controller("TruthTableCtrl",function(e){function t(e){return _.chain(e.value).keys().map(function(e,t){return e in this.labels?this.labels[e]:e}.bind(e)).value()}function i(e){var t,i;return t=[],i=e.value,_.each(_.values(i),function(e,i){_.each(e,function(e,s){t[s]||t.push([]),t[s][i]=e})}),t}this.premises=[],this.selectedPremises=[],this.premise="",this.truthTable={},this.build=function(){this.premise&&(e.generate(this.premise),this.truthTable.header=t(e),this.truthTable.rows=i(e))}});
-"use strict";angular.module("logicToolsApp").factory("formula",function(){function n(n){return/[=][>]/g.exec(n)}function r(n){return/[&]/g.exec(n)}function u(n){return/[|]/g.exec(n)}function t(n){return/[<][=][>]/g.exec(n)}return{resultFn:function(e){var c;return t(e)?c=function(n,r){return(!n||r)&&(!r||n)}:n(e)?c=function(n,r){return!n||r}:r(e)?c=function(n,r){return n&&r}:u(e)&&(c=function(n,r){return n||r}),c}}});
-angular.module("logicToolsApp").service("syntaxChecker",function(){function n(n){return!n.value}this.validate=function(e){return!n(e)}});
-angular.module("logicToolsApp").factory("FitchStack",function(e){function t(e){i=0,this.scopes=[p],this.scopeHistory=[p]}function s(e){return e.slice(-1)[0]}function o(t){var s=_.chain(t).map(function(e){return{layer:e.scopeLayer,id:e.scopeId}}).uniqBy("id").map(function(t){return e["new"]({layer:t.layer,id:t.id})}).value();return _.find(s,{layer:0})?s:[p].concat(s)}function n(e){return _.groupBy(e,"scopeId")}function r(e,t){return _.chain(e).map(function(e){return e.items=_.sortBy(n(t)[e.id],"scopeId"),e.blur(),e}).value()}function c(e,t){var s,o,n,r;return n=[p.id],s=0,_.forEach(t,function(e){r=n.indexOf(e.scopeId),s<=e.scopeLayer&&-1===r?n.push(e.scopeId):s>e.scopeLayer&&-1!==r&&n.splice(o,1),s=e.scopeLayer,o=r}),_.filter(e,function(e){return-1!==n.indexOf(e.id)})}var i,p;return i=0,p=e["new"]({layer:i}),t.prototype.closeScope=function(){var e,t;return e=_.remove(this.scopes,"isFocused"),(t=this.scopes[this.scopes.length-1])?(t.focus(),t.layer=--i,e[0]):e[0]},t.prototype.openScope=function(t){var s=e["new"]({head:t,layer:++i});this.scopes.length&&(this.scopes=_.map(this.scopes,function(e){return e.blur(),e})),this.scopes.push(s),this.scopeHistory.push(s)},t.prototype.entail=function(e){var t=this.getCurrentScope();t.append(e)},t.prototype.getCurrentScope=function(){return _.filter(this.scopes,"isFocused")[0]},t.prototype.reset=function(e){var t;this.scopes.length=0,this.scopeHistory.length=0,this.scopes=r(o(e),e),t=_.find(this.scopes,{id:s(e).scopeId}),t.focus(),i=t.layer,this.scopeHistory=this.scopes,this.scopes=c(this.scopes,e)},{"new":function(e){var s=e||{};return new t(s)}}});
-angular.module("logicToolsApp").factory("PremiseTree",function(){function e(e){this.premises=[],this.proofTree=[]}function r(e,r){var n=_.filter(e,function(e){return e.id!==r.id});return h(n,r)}function n(e,r){return _.filter(e,function(e){return e!==r})}function i(e,r){return _.filter(e,function(e){return!!o(r,e)})}function t(e,r,t){var o=u(r,t);return _.chain(e).filter(function(e,r){return r!==o}).map(function(e){var o=n(e,t.id);return i(o,r)}).value()}function o(e,r){return _.find(e,{id:r})}function s(e,r,n){var i=u(r,n);return e[i]}function u(e,r){return _.chain(e).map("id").indexOf(r.id).value()}function f(e,r,n){return _.filter(e,function(e,i){return-1===n.indexOf(r[i].id)})}function p(e,r){return _.filter(e,function(e){return-1===r.indexOf(e.id)})}function c(e,r,n){return _.chain(n).map(function(n){var i=o(r,n)||{};return s(e,r,i)}).flattenDeep().filter(function(e){return!!e}).value()}function h(e,r){var n,i,t;return t=0,_.map(e,function(e){return i===e.scopeLayer&&n!==e.scopeId&&t++,i=e.scopeLayer,n=e.scopeId,e.scopeLayer+=t,e})}return e.prototype.appendNode=function(e){this.proofTree.push([]),this.premises.push(e)},e.prototype.appendChildNode=function(e,r){var n,i;n=this.premises.indexOf(e),i=this.premises.indexOf(r),this.proofTree[n].push(r.id),-1===i&&(this.premises.push(r),this.proofTree.push([]))},e.prototype.removeNode=function(e){var n,i;for(n=s(this.proofTree,this.premises,e);n.length;)i=c(this.proofTree,this.premises,n),this.proofTree=f(this.proofTree,this.premises,n),this.premises=p(this.premises,n),n=i;return this.proofTree=t(this.proofTree,this.premises,e),this.premises=r(this.premises,e),this.premises},{"new":function(r){return new e(r)}}});
-angular.module("logicToolsApp").factory("Scope",function(){function t(t){this.id=t.id||++e,this.layer=t.layer,this.isFocused=!0,this.items=[],t.head&&this.items.push(t.head)}var e=0;return t.prototype.append=function(t){this.items.push(t)},t.prototype.blur=function(){this.isFocused=!1},t.prototype.focus=function(){this.isFocused=!0},t.prototype.remove=function(t){var e=t.indexOf(t);return this.items.splice(e,1)},Object.defineProperty(t.prototype,"head",{get:function(){return this.items[0]}}),Object.defineProperty(t.prototype,"last",{get:function(){return this.items[this.items.length-1]}}),Object.defineProperty(t.prototype,"size",{get:function(){return this.items.length}}),{"new":function(e){var i=e||{};return new t(i)}}});
-angular.module("logicToolsApp").service("fitchBicondition",function(n){function e(n,e){var i,t;return i=n.digest(),t=e.digest(),n.isImplication(i)&&e.isImplication(t)}function i(n,e){var i,t,o,u,r,d;return i=n.digest(),t=e.digest(),o=n.getExpandedConclusion(i),u=n.getExpandedAssumption(i),r=e.getExpandedConclusion(t),d=e.getExpandedAssumption(t),o===d&&r===u}function t(e,i,t){var o,u;return o=i.split(/[<][=][>]/g),u=o.length,_.map(o,function(i){return u--,n["new"]({scopeLayer:t.layer,scopeId:t.id,value:e.expand(i)+"=>"+e.expand(o[u])})})}function o(e,i){return _.map(e,function(e){var t=e.digest();return n["new"]({scopeLayer:i.layer,scopeId:i.id,value:e.getExpandedConclusion(t)+"<=>"+e.getExpandedAssumption(t)})})}this.introduction=function(n,t){return e(n[0],n[1])&&i(n[0],n[1])?o(n,t):null},this.elimination=function(n,e){var i=n.digest();return n.isBicon(i)?t(n,i,e):null}});
-angular.module("logicToolsApp").service("fitchConjunction",function(n){function e(n,e){return _.chain(n).map(function(t){return u(t,n,e)}).flattenDeep().value()}function u(e,u,t){return _.map(u,function(u){return n["new"]({scopeLayer:t.layer,scopeId:t.id,value:e+"&"+u})})}this.introduction=function(n,u){var t=_.map(n,function(n){return n.isCompound()?"("+n.value+")":n.value});return e(t,u)},this.elimination=function(e,u){var t=e.digest();return _.chain(t).split(/\&+/).map(function(t){var i=e.expand(t);return n["new"]({scopeLayer:u.layer,scopeId:u.id,value:e.unwrap(i)})}).value()}});
-"use strict";angular.module("logicToolsApp").service("fitchDisjunction",function(n){function t(n){return _.chain(n).map(function(n){return n.expand(n.getConclusion(n.digest()))}).uniq().value()}function e(n){return _.map(n,function(n){return n.expand(n.getAssumption(n.digest()))})}function i(n,t,e){return _.chain(t).map(function(t){return u([n,t],e)}).flattenDeep().value()}function u(t,e){var i=t.length;return _.map(t,function(u){return i--,n["new"]({scopeLayer:e.layer,scopeId:e.id,value:u+"|"+t[i]})})}function r(n,t){var e,i;return e=t.digest(),i=n.slice(),_.filter(e.split(/\|+/),function(n){return-1!==i.indexOf(t.expand(n))}).length===n.length}this.elimination=function(i,u){var o,c;return c=e(i.implications),o=t(i.implications),1!==o.length?null:r(c,i.disjunctions[0])?n["new"]({scopeLayer:u.layer,scopeId:u.id,value:o[0]}):null},this.introduction=function(n,t,e){var u=_.map(t,function(n){return n.isCompound()?"("+n.value+")":n.value});return i(n,u,e)}});
-"use strict";angular.module("logicToolsApp").service("fitchImplication",function(e){function a(a,n,u){var i,l,o,t;return o=a.digest(),i=a.getAssumption(o),t=a.hasNegation(i),i=a.expand(i),i=t?i:a.unwrap(i),i===n.value?(l=a.getConclusion(o),e["new"]({scopeLayer:u.layer,scopeId:u.id,value:a.expand(l)})):null}this.introduction=function(a,n){var u,i,l,o,t,s;return u=n.head,i=n.last,l=u.digest(),o=i.digest(),t=u.isCompound(u.value)?"("+u.value+")":u.value,s=i.isCompound(i.value)?"("+i.value+")":i.value,u.hasNegation(l)&&l!==u.value&&(t=u.value),i.hasNegation(o)&&o!==i.value&&(s=i.value),e["new"]({scopeLayer:a.layer,scopeId:a.id,value:t+"=>"+s})},this.elimination=function(e,n,u){var i=a(n,e,u)||a(e,n,u);return i?(i.scopeLayer=u.layer,i.scopeId=u.id,i):null}});
-"use strict";angular.module("logicToolsApp").service("fitchNegation",function(n){function e(n,e){return n.isImplication()&&e.isImplication()}function t(n,e){return c(n)===c(e)}function i(n,e){return u(n,e)||u(e,n)}function r(n,e){return o(n,e)||o(e,n)}function o(n,e){return l(n)===s(e)}function u(n,e){var t,i;return t=g(n),i=g(e),n.hasNegation(t)&&!n.hasNegation(i)}function a(n){return n.replace(/\~+/g,"")}function c(n){var e,t;return e=n.digest(),t=n.getAssumption(e),n.expand(t)}function s(n){var e,t,i;return e=n.digest(),t=n.getConclusion(e),i=n.expand(a(t)),n.hasNegation(t)?"~"+i:i}function l(n){var e,t;return e=n.digest(),t=n.getConclusion(e),n.expand(a(t))}function g(n,e){var e,t;return e=n.digest(),t=n.getConclusion(e)}this.introduction=function(o,u,a){var s;return e(o,u)&&t(o,u)&&i(o,u)&&r(o,u)?(s=c(o),n["new"]({scopeLayer:a.layer,scopeId:a.id,value:"~"+s})):null},this.elimination=function(e,t){var i,r,o;return i=e.digest(),o=e.value.match(/^\~+/)[0],o.length<=1?void 0:(r=o.slice(2)+e.removeNegation(i),r=e.hasNegation(r)?e.expand(r):e.unwrap(e.expand(r)),n["new"]({scopeLayer:t.layer,scopeId:t.id,value:r}))}});
-angular.module("logicToolsApp").factory("Premise",function(){function t(t){this.labels={},this.id=++v,this.scopeLayer=t.scopeLayer,this.scopeId=t.scopeId,this.value=c(t.value)}function e(t){return t.match(/[(]{1}[\w~<=>|&]+(?=[)]{1})[)]{1}/g)}function n(t,e){var n;return n=_.keys(t),Array.prototype.map.call(e,function(e,r){return-1!==n.indexOf(e)?t[e]:e}).join("")}function r(t){return e(t)?e(t):[t]}function o(t,e,n){var r;return e=e.replace(/[|]/g,"[|]"),r=new RegExp("[(]"+e+"[)]","g"),t.replace(r,n)}function i(t,e){var n,r;return n=e.slice(),r=_.keys(t),_.map(r,function(e){return n=n.replace(e,t[e])}).slice(-1)[0]}function u(t){return t.split(s)}function a(t){var e;if(t)return e=t.match(/[(]{1}([\w\W]+)[)]{1}/),e?e[1]:t}function c(t){return t.replace(/\s+/g,"")}var p,s,v;return p=/^\~+/,s=/[=][>]/g,v=0,t.prototype.digest=function(t){var i,u,c,p,s;for(s=this.value,i=[],p={},c=0;i;)i=e(s),_.each(r(s),function(e){u=e.slice(),p[++c]=n(p,u),s=o(s,a(e),c),t&&t(e,s,c)});return this.labels=_.assign({},p),s},t.prototype.isImplication=function(t){var e=t||this.value;return!!e.match(s)},t.prototype.isAnd=function(t){var e=t||this.value;return/[&]/g.exec(e)},t.prototype.isOr=function(t){var e=t||this.value;return/[|]/g.exec(e)},t.prototype.isBicon=function(t){var e=t||this.value;return/[<][=][>]/g.exec(e)},t.prototype.expand=function(t){var e,n,r,o;return n=t.replace(p,""),r=this.labels,e=r[n]||this.removeNegation(t),o=this.hasNegation(t)?t.match(p)[0]:"",o+i(r,e)},t.prototype.getAssumption=function(t){var e,n;return e=t||this.value,n=u(e),n?n[0]:void 0},t.prototype.getConclusion=function(t){var e,n;return e=t||this.value,n=u(e),n?n[1]:void 0},t.prototype.getExpandedAssumption=function(t){var e,n;return e=t||this.value,n=u(e),n?this.expand(n[0]):void 0},t.prototype.getExpandedConclusion=function(t){var e,n;return e=t||this.value,n=u(e),n?this.expand(n[1]):void 0},t.prototype.getPrimitives=function(t){var e=t||this.value;return e.match(/\w+/g)},t.prototype.removeNegation=function(t){var e=t||this.value;return e.replace(p,"")},t.prototype.hasNegation=function(t){var e=t||this.value;return!!e.match(p)},t.prototype.isCompound=function(t){var e=t||this.value;return!!e.match(/[<=>|&]+/)},t.prototype.unwrap=function(t){return a(t||this.value)},{"new":function(e){return new t(e)}}});
-"use strict";angular.module("logicToolsApp").service("tableGenerator",function(t,e){function n(){this.value={},this.labels={}}function a(t){return _.uniq(t.match(/[^~<=>()&|\s]/g))}function i(t,e){var n,a,i;return n=_.keys(t),i=Math.pow(2,n.length),a=0,_.mapValues(t,function(t,e){return r.getAtomicValue(++a,i)})}function u(t){var e,n;return e={},_.forEach(t,function(t,a){e[t]=[],n=i(e,a)}),n}function s(t){var e;return e=_.assign({},t),l.digest(function(t,n,a){e[a]=r.getCompoundValue(t,a,e)}),e}var l,r;this.generate=function(i){var o,c;o=[],this.premise=i,l=t["new"]({value:i}),r=e["new"](),n.call(this),c=a(i),this.value=u(c),this.value=_.assign({},this.value,s(this.value)),this.labels=l.labels},n.call(this)});
-angular.module("logicToolsApp").factory("Table",function(formula){function Table(){}function _negateColumn(value,premise){var negation,result,atomic,operator;return negation=premise.match(/[~]/g),atomic=premise.match(/\w+/g),result=negation?_.map(value[atomic[0]],function(val,key){return operator=negation.join("").replace(/[~]/g,"!"),Number(eval(operator+val))}):value[atomic[0]]}return Table.prototype.getCompoundValue=function(e,t,o){var a,n,r,u,l,i,m,c;for(i=formula.resultFn(e),m=e.match(/\w+|[~]+\w|\d+|[~]+\d/g),c=[],a=_negateColumn(o,m[0]),n=_negateColumn(o,m[1]),r=0;a.length>r;)u=a[r],l=n[r],c.push(Number(i(u,l))),r++;return c},Table.prototype.getAtomicValue=function(e,t){var o,a,n,r,u;for(o=[],a=0,n=1,u=1,r=Math.pow(2,e);t>=n;)n>1/r*t*u&&(a=1-a,u++),o.push(a),n++;return o},{"new":function(){return new Table}}});
+'use strict';
+
+angular
+    .module('logicToolsApp', ['ui.router'])
+    .config(function ($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise('/');
+        $stateProvider
+            .state('main', {
+                url: '/',
+                templateUrl: 'templates/main.html',
+                controller: 'MainCtrl as main'
+            })
+            .state('truthTables', {
+                url: '/truth-tables',
+                templateUrl: 'templates/truth-table.html',
+                controller: 'TruthTableCtrl as table'
+            })
+            .state('fitchSystems', {
+                url: '/fitch',
+                templateUrl: 'templates/fitch.html',
+                controller: 'FitchCtrl as fitch'
+            });
+    })
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .controller('FitchCtrl', function (
+      FitchStack,
+      Premise,
+      PremiseTree,
+      fitchBicondition,
+      fitchConjunction,
+      fitchDisjunction,
+      fitchImplication,
+      fitchNegation,
+      syntaxChecker
+    ) {
+
+      _init.call(this);
+
+      this.assume = function() {
+        var currentScope, labels, headPremise;
+
+        headPremise = Premise.new({
+          value: this.premise
+        });
+
+        if (!syntaxChecker.validate(headPremise)) {
+          return;
+        }
+
+        this.structure.openScope(headPremise);
+        currentScope = this.structure.getCurrentScope();
+        headPremise.scopeId = currentScope.id;
+        headPremise.scopeLayer = currentScope.layer;
+        this.premiseGraph.appendNode(headPremise);
+        this.premise = '';
+      };
+
+      this.refresh = function () {
+        _init.call(this);
+      }
+
+      this.closeDisjoinField = function () {
+        this.showDisjoinField = false;
+        this.valueToDisjoin = '';
+      }
+
+      this.disjoinPremise = function () {
+        var newPremises, currentScope, selected, disjointPremise;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (!selected.length || !this.valueToDisjoin) {
+            return;
+        }
+        newPremises = fitchDisjunction.introduction(this.valueToDisjoin, selected, currentScope);
+        this.showDisjoinField = false;
+        this.valueToDisjoin = '';
+        if (!newPremises) {
+            return;
+        }
+        _multipleEntialment.call(this, newPremises, selected);
+      };
+
+      /*Operations*/
+      this.andIntroduction = function () {
+        var selected, newPremises, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length < 2) {
+          return;
+        }
+        newPremises = fitchConjunction.introduction(selected, currentScope);
+        if (!newPremises) {
+          return;
+        }
+        _multipleEntialment.call(this, newPremises, selected);
+      };
+      this.andElimination = function () {
+        var selected, newPremises, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length !== 1) {
+          return;
+        }
+        newPremises = fitchConjunction.elimination(selected[0], currentScope);
+        if (!newPremises) {
+          return;
+        }
+        _multipleEntialment.call(this, newPremises, selected);
+      };
+      this.negationIntro = function() {
+        var selected, newPremise, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length !== 2) {
+          return;
+        }
+        newPremise = fitchNegation.introduction(selected[0], selected[1], currentScope);
+        if (!newPremise) {
+          return;
+        }
+        _entail.call(this, newPremise, selected);
+      };
+      this.negationElim = function() {
+        var selected, newPremise, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length > 1) {
+          return;
+        }
+        newPremise = fitchNegation.elimination(selected[0], currentScope);
+        if (!newPremise) {
+          return;
+        }
+        _entail.call(this, newPremise, selected);
+      };
+      this.implicationIntro = function() {
+        var lastScope, currentScope, newPremise;
+        lastScope = this.structure.closeScope();
+        currentScope = this.structure.getCurrentScope();
+        newPremise = fitchImplication.introduction(currentScope, lastScope);
+        _entail.call(this, newPremise, [lastScope.head, lastScope.last]);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+      };
+
+      this.implicationElim = function() {
+        var selected, newPremise, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length !== 2) {
+          return;
+        }
+        newPremise = fitchImplication.elimination(selected[0], selected[1], currentScope);
+        if (!newPremise) {
+          return;
+        }
+        _entail.call(this, newPremise, selected);
+      };
+
+      this.orElimination = function () {
+        var selected, currentScope, newPremise, groupedPremises;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length < 3) {
+          return;
+        }
+        groupedPremises = _groupOrPremises(selected);
+        if (!groupedPremises) {
+          return;
+        }
+        newPremise = fitchDisjunction.elimination(groupedPremises, currentScope);
+        if (!newPremise) {
+          return;
+        }
+        _entail.call(this, newPremise, groupedPremises);
+      };
+      this.orIntroduction = function () {
+        this.showDisjoinField = true;
+      };
+      this.reiterate = function() {
+        var reiterated, currentScope, selected;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        reiterated = selected.map(function(premise, key) {
+                            return Premise.new({
+                                scopeLayer: currentScope.layer,
+                                scopeId: currentScope.id,
+                                value: premise.value
+                            });
+                        });
+        _.forEach(reiterated, function (premise) {
+          _entail.call(this, premise, selected);
+        }.bind(this));
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+      };
+      this.delete = function () {
+        var selected, scopeIds;
+        selected = _getSelectedPremises(this.premiseGraph.premises);
+        _.forEach(selected, function (premise) {
+          this.premiseGraph.removeNode(premise);
+        }.bind(this));
+        scopeIds = _.map(this.premiseGraph.premises, 'scopeId');
+        this.structure.reset(this.premiseGraph.premises);
+      };
+      this.biconditionalIntro = function () {
+        var selected, newPremises, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length !== 2) {
+          return;
+        }
+        newPremises = fitchBicondition.introduction(selected, currentScope);
+        if (!newPremises) {
+          return;
+        }
+        _multipleEntialment.call(this, newPremises, selected);
+      }
+      this.biconditionalElim = function () {
+        var selected, newPremises, secondPremise, currentScope;
+        currentScope = this.structure.getCurrentScope();
+        selected = _getValidSelecedPremises(this.premiseGraph.premises, this.structure.scopes);
+        _uncheckPremises(this.premiseGraph.premises, this.selected);
+        if (selected.length !== 1) {
+          return;
+        }
+        newPremises = fitchBicondition.elimination(selected[0], currentScope);
+        if (!newPremises) {
+          return;
+        }
+        _multipleEntialment.call(this, newPremises, selected);
+      }
+
+      /*Local functions*/
+      function _init() {
+        this.marginLeft = 20; //pixels
+        this.premise = '';
+        this.premiseGraph = PremiseTree.new();
+        this.selected = [];
+        this.showDisjoinField = false;
+        this.structure = FitchStack.new();
+        this.valueToDisjoin = '';
+      }
+      function _entail(premise, parentPremises) {
+        this.structure.entail(premise);
+        _appendPremiseChild(this.premiseGraph, premise, parentPremises);
+      }
+
+      function _multipleEntialment(premises, parentPremises) {
+        _.forEach(premises, function (premise) {
+          _entail.call(this, premise, parentPremises);
+        }.bind(this));
+      }
+
+      function _getSelectedPremises(premises) {
+        return _.filter(premises, 'checked');
+      }
+
+      function _getValidSelecedPremises(premises, scopes) {
+        var scopeIds = _.map(scopes, 'id');
+        return _getSelectedPremises(premises)
+               .filter(function(premise) {
+                    return scopeIds.indexOf(premise.scopeId) !== -1;
+                });
+      }
+
+      function _uncheckPremises(premises, selected) {
+        selected.length = 0;
+        return _.map(premises, function(premise) {
+            premise.checked = false;
+            return premise;
+        });
+      }
+
+      function _groupOrPremises(premises) {
+        var disjunctions, implications;
+        disjunctions = _.filter(premises, function (premise) {
+          return premise.isOr(premise.digest());
+        });
+        if  (disjunctions.length !== 1) {
+          return null;
+        }
+        implications = _.filter(premises, function (premise) {
+          return premise.isImplication(premise.digest());
+        });
+        if  (implications.length !== premises.length - 1) {
+          return null;
+        }
+        return {
+          disjunctions: disjunctions,
+          implications: implications
+        };
+      }
+
+      function _appendPremiseChild(structrue, childPremise, parentPremises) {
+        _.forEach(parentPremises, function (premise) {
+          structrue.appendChildNode(premise, childPremise);
+        });
+      }
+
+    });
+
+'use strict';
+angular
+  .module('logicToolsApp')
+  .controller('MainCtrl', function ($location) {
+        this.goToTruth = function() {
+            $location.path('/truth-tables');
+        };
+        this.goToFitch = function() {
+            $location.path('/fitch');
+        };
+  });
+
+'use strict';
+
+angular.module('logicToolsApp')
+  .controller('MenuCtrl', function () {
+    
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .controller('TruthTableCtrl', function (tableGenerator) {
+        this.premises = [];
+        this.selectedPremises = [];
+        this.premise = '';
+        this.truthTable = {};
+        this.build = function() {
+            if(this.premise) {
+                tableGenerator.generate(this.premise);
+                this.truthTable.header = getTableHeader(tableGenerator);
+                this.truthTable.rows = getTableRows(tableGenerator);
+            }
+        };
+        function readPremise(premise) {
+            return premise.trim().split(/\s+/g);
+        }
+        function getTableHeader(table) {
+            return _.chain(table.value).keys().map(function(val, key) {
+                return (val in this.labels) ? this.labels[val] : val;
+            }.bind(table)).value();
+        }
+        function getTableRows(table) {
+            var rows, tableValue;
+            rows = [];
+            tableValue = table.value;
+            _.each(_.values(tableValue), function(col, keyc) {
+                _.each(col, function(val, keyr) {
+                    if (!rows[keyr]) {
+                      rows.push([]);
+                    }
+                    rows[keyr][keyc] = val;
+                });
+            });
+            return rows;
+        }
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .factory('formula', function() {
+
+    function isThen(premise) {
+      return /[=][>]/g.exec(premise);
+    }
+    function isAnd(premise) {
+      return /[&]/g.exec(premise);
+    }
+    function isOr(premise) {
+      return /[|]/g.exec(premise);
+    }
+    function isBicon(premise) {
+      return /[<][=][>]/g.exec(premise);
+    }
+
+    return {
+      /*Truth table methods*/
+      resultFn: function(premise) {
+        var getResult;
+        if (isBicon(premise)) {
+            getResult = function(a, b) {
+                return (!a || b) && (!b || a);
+            }
+        } else if (isThen(premise)) {
+            getResult = function(a, b) {
+                return !a || b;
+            }
+        } else if (isAnd(premise)) {
+            getResult = function(a, b) {
+                return a && b;
+            }
+        } else if (isOr(premise)) {
+            getResult = function(a, b) {
+                return a || b;
+            }
+        }
+        return getResult;
+      }
+    }
+  });
+
+angular
+  .module('logicToolsApp')
+  .service('syntaxChecker', function () {
+    this.validate = function (premise) {
+      if (_emptyPremise(premise)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function _emptyPremise(premise) {
+      return !premise.value;
+    }
+    
+  });
+
+angular
+  .module('logicToolsApp')
+  .factory('FitchStack', function(Scope) {
+
+    var scopeLayer, universalScope;
+    scopeLayer = 0;
+    universalScope = Scope.new({
+      layer: scopeLayer
+    });
+
+    function FitchStack(props) {
+      scopeLayer = 0;
+      this.scopes = [universalScope];
+      this.scopeHistory = [universalScope];
+    }
+
+    FitchStack.prototype.closeScope = function() {
+      var removedScope, newCurrentScope;
+      removedScope = _.remove(this.scopes, 'isFocused');
+      newCurrentScope = this.scopes[this.scopes.length - 1];
+      if (!newCurrentScope) {
+        return removedScope[0];
+      }
+      newCurrentScope.focus();
+      newCurrentScope.layer = --scopeLayer;
+      return removedScope[0];
+    };
+
+    FitchStack.prototype.openScope = function(headAssumption) {
+      var scope = Scope.new({
+        head: headAssumption,
+        layer: ++scopeLayer
+      });
+
+      if (this.scopes.length) {
+        this.scopes = _.map(this.scopes, function(scope) {
+          scope.blur();
+          return scope;
+        });
+      }
+
+      this.scopes.push(scope);
+      this.scopeHistory.push(scope);
+    };
+
+    FitchStack.prototype.entail = function(assumption) {
+      var currentScope = this.getCurrentScope();
+      currentScope.append(assumption);
+    };
+
+    FitchStack.prototype.getCurrentScope = function() {
+      return _.filter(this.scopes, 'isFocused')[0];
+    };
+
+    FitchStack.prototype.reset = function (premises) {
+      var currentScope;
+      this.scopes.length = 0;
+      this.scopeHistory.length = 0;
+      this.scopes = _setScopesItems(_createScopes(premises), premises);
+      currentScope = _.find(this.scopes, {
+        id: _getLastItem(premises).scopeId
+      });
+      currentScope.focus();
+      scopeLayer = currentScope.layer;
+      this.scopeHistory = this.scopes;
+      this.scopes = _getActiveScopes(this.scopes, premises);
+    }
+
+    function _getLastItem(items) {
+      return items.slice(-1)[0];
+    }
+
+    function _createScopes(premises) {
+      var scopes = _.chain(premises)
+                    .map(function (premise) {
+                      return {
+                        layer: premise.scopeLayer,
+                        id: premise.scopeId
+                      };
+                    })
+                    .uniqBy('id')
+                    .map(function (scopeBase) {
+                      return Scope.new({
+                        layer: scopeBase.layer,
+                        id: scopeBase.id
+                      });
+                    })
+                    .value();
+      return _.find(scopes, {layer: 0}) 
+                  ? scopes
+                  : [universalScope].concat(scopes);
+    }
+
+    function _premisesByScope(premises) {
+      return _.groupBy(premises, 'scopeId');
+    }
+
+    function _setScopesItems(scopes, premises) {
+      return _.chain(scopes)
+              .map(function (scope) {
+                scope.items = _.sortBy(_premisesByScope(premises)[scope.id], 'scopeId');
+                scope.blur();
+                return scope;
+              })
+              .value();
+    }
+
+    function _getActiveScopes(scopes, premises) {
+      var prevScopeLayer, prevScopePosition, activeIds, scopePosition;
+      activeIds = [universalScope.id];
+      prevScopeLayer = 0;
+      _.forEach(premises, function (premise) {
+        scopePosition = activeIds.indexOf(premise.scopeId);
+        if (prevScopeLayer <= premise.scopeLayer && scopePosition === -1) {
+          activeIds.push(premise.scopeId);
+        } else if (prevScopeLayer > premise.scopeLayer && scopePosition !== -1) {
+          activeIds.splice(prevScopePosition, 1);
+        }
+        prevScopeLayer = premise.scopeLayer;
+        prevScopePosition = scopePosition;
+      });
+      return _.filter(scopes, function (scope) {
+        return activeIds.indexOf(scope.id) !== -1;
+      });
+    }
+
+    return {
+      new: function(props) {
+        var fitchProps = props || {};
+        return new FitchStack(fitchProps);
+      }
+    }
+
+  });
+
+angular
+  .module('logicToolsApp')
+  .factory('PremiseTree', function () {
+
+    function PremiseTree(props) {
+      this.premises = [];
+      this.proofTree = [];
+    }
+
+    PremiseTree.prototype.appendNode = function (premiseNode) {
+      this.proofTree.push([]);
+      this.premises.push(premiseNode);
+    }
+
+    PremiseTree.prototype.appendChildNode = function (parentPremise, childPremise) {
+      var parentIndex, childIndex;
+      parentIndex = this.premises.indexOf(parentPremise);
+      childIndex = this.premises.indexOf(childPremise);
+
+      this.proofTree[parentIndex].push(childPremise.id);
+
+      if (childIndex === -1) {
+        this.premises.push(childPremise);
+        this.proofTree.push([]);
+      }
+    }
+
+    PremiseTree.prototype.removeNode = function (premiseToRemove) {
+      var childrenIds, grandChildrenIds;
+      childrenIds = _getChildrenIds(this.proofTree, this.premises, premiseToRemove);
+      while (childrenIds.length) {
+        grandChildrenIds = _getGrandchildren(this.proofTree, this.premises, childrenIds);
+        this.proofTree = _cutTree(this.proofTree, this.premises, childrenIds);
+        this.premises = _cutPremises(this.premises, childrenIds);
+        childrenIds = grandChildrenIds;
+      }
+      this.proofTree = _removeTreeNode(this.proofTree, this.premises, premiseToRemove);
+      this.premises = _removePremise(this.premises, premiseToRemove);
+      return this.premises;
+    }
+
+    function _removePremise(premises, premiseToRemove) {
+      var filteredPremises = _.filter(premises, function (premise) {
+        return premise.id !== premiseToRemove.id;
+      });
+      return _mergePremiseScopes(filteredPremises, premiseToRemove);
+    }
+
+    function _removeChildNode(node, childNode) {
+      return _.filter(node, function (child) {
+        return child !== childNode;
+      });
+    }
+
+    function _removeInvalidChildren(node, premises) {
+      return _.filter(node, function (child) {
+        return !!_findPremise(premises, child);
+      });
+    }
+
+    function _removeTreeNode(proofTree, premises, premiseToRemove) {
+      var premiseIndex = _getPremiseNodeIndex(premises, premiseToRemove);
+      return _.chain(proofTree)
+              .filter(function (node, indexNode) {
+                return indexNode !== premiseIndex;
+              })
+              .map(function (node) {
+                var newNode = _removeChildNode(node, premiseToRemove.id);
+                return _removeInvalidChildren(newNode, premises);
+              })
+              .value();
+    }
+
+    function _findPremise(premises, id) {
+      return _.find(premises, {id: id});
+    }
+
+    function _getChildrenIds(proofTree, premises, premise) {
+      var index = _getPremiseNodeIndex(premises, premise);
+      return proofTree[index];
+    }
+
+    function _getPremiseNodeIndex(premises, premise) {
+      return _.chain(premises)
+              .map('id')
+              .indexOf(premise.id)
+              .value();
+    }
+
+    function _cutTree(proofTree, premises, ids) {
+      return _.filter(proofTree, function (node, indexNode) {
+        return ids.indexOf(premises[indexNode].id) === -1;
+      });
+    }
+
+    function _cutPremises(premises, ids) {
+      return  _.filter(premises, function (premise) {
+        return ids.indexOf(premise.id) === -1;
+      });
+    }
+
+    function _getGrandchildren(proofTree, premises, childrenIds) {
+      return _.chain(childrenIds)
+              .map(function (id) {
+                var premise = _findPremise(premises, id) || {};
+                return _getChildrenIds(proofTree, premises, premise);
+               })
+              .flattenDeep()
+              .filter(function (id) {
+                return !!id;
+              })
+              .value();
+    }
+
+    function _mergePremiseScopes(premises, premiseToRemove) {
+      var prevScopeId, prevScopeLayer, layerIncrement;
+      layerIncrement = 0;
+      return _.map(premises, function (premise) {
+        if (prevScopeLayer === premise.scopeLayer && prevScopeId !== premise.scopeId) {
+          layerIncrement++;
+        }
+        prevScopeLayer = premise.scopeLayer;
+        prevScopeId = premise.scopeId;
+        premise.scopeLayer += layerIncrement;
+        return premise;
+      });
+    }
+
+    return {
+      new: function (props) {
+        return new PremiseTree(props);
+      }
+    };
+
+  });
+
+angular
+  .module('logicToolsApp')
+  .factory('Scope', function() {
+
+    var id = 0;
+    function Scope(props) {
+      this.id = props.id || ++id;
+      this.layer = props.layer;
+      this.isFocused = true;
+      this.items = [];
+
+      if (props.head) {
+        this.items.push(props.head);
+      }
+    }
+
+    Scope.prototype.append = function(item) {
+      this.items.push(item);
+    }
+
+    Scope.prototype.blur = function() {
+      this.isFocused = false;
+    }
+
+    Scope.prototype.focus = function() {
+      this.isFocused = true;
+    }
+
+    Scope.prototype.remove = function(item) {
+      var index = item.indexOf(item);
+      return this.items.splice(index, 1);
+    }
+
+    Object.defineProperty(Scope.prototype, 'head', {
+      get: function() {
+        return this.items[0];
+      }
+    });
+
+    Object.defineProperty(Scope.prototype, 'last', {
+      get: function() {
+        return this.items[this.items.length - 1];
+      }
+    });
+
+    Object.defineProperty(Scope.prototype, 'size', {
+      get: function() {
+        return this.items.length;
+      }
+    });
+
+    return {
+      new: function(props) {
+        var scopeProps = props || {};
+        return new Scope(scopeProps);
+      }
+    }
+
+  });
+
+angular
+  .module('logicToolsApp')
+  .service('fitchBicondition', function (Premise) {
+    this.introduction = function (premises, scope) {
+      if (!_validatePremises(premises[0], premises[1])) {
+        return null;
+      }
+      if (!_validateImplications(premises[0], premises[1])) {
+        return null;
+      }
+      return _getBiconditions(premises, scope);
+    };
+
+    this.elimination = function (premise, scope) {
+      var digested = premise.digest();
+      if (!premise.isBicon(digested)) {
+        return null;
+      }
+
+      return _getImplications(premise, digested, scope);
+    }
+
+    function _validatePremises(firstPremise, secondPremise) {
+      var firstValue, secondValue;
+      firstValue = firstPremise.digest();
+      secondValue = secondPremise.digest();
+      return firstPremise.isImplication(firstValue) && secondPremise.isImplication(secondValue);
+    }
+    function _validateImplications(firstPremise, secondPremise) {
+      var firstValue, secondValue, firstConclusion, firstAssumption,
+          secondConclusion, secondAssumption;
+      firstValue = firstPremise.digest();
+      secondValue = secondPremise.digest();
+      firstConclusion = firstPremise.getExpandedConclusion(firstValue);
+      firstAssumption = firstPremise.getExpandedAssumption(firstValue);
+      secondConclusion = secondPremise.getExpandedConclusion(secondValue);
+      secondAssumption = secondPremise.getExpandedAssumption(secondValue);
+      return firstConclusion === secondAssumption && secondConclusion === firstAssumption;
+    }
+    function _getImplications(premise, digested, scope) {
+      var atomics, index;
+      atomics = digested.split(/[<][=][>]/g);
+      index = atomics.length;
+      return _.map(atomics, function (atomicPremise) {
+        index--;
+        return Premise.new({
+          scopeLayer: scope.layer,
+          scopeId: scope.id,
+          value: premise.expand(atomicPremise) + '=>' + premise.expand(atomics[index])
+        });
+      });
+    }
+    function _getBiconditions(premises, scope) {
+      return _.map(premises, function (premise) {
+        var value = premise.digest()
+        return Premise.new({
+          scopeLayer: scope.layer,
+          scopeId: scope.id,
+          value: premise.getExpandedConclusion(value) + '<=>' + premise.getExpandedAssumption(value)
+        })
+      });
+    }
+  });
+
+angular
+  .module('logicToolsApp')
+  .service('fitchConjunction', function (Premise) {
+    this.introduction = function (premises, scope) {
+      var selectedValues = _.map(premises, function (premise) {
+          return (premise.isCompound())
+                    ? '(' + premise.value + ')'
+                    : premise.value;
+      })
+      return _getConjuctions(selectedValues, scope);
+    }
+    this.elimination = function (premise, scope) {
+      var digestedPremise = premise.digest();
+      return _.chain(digestedPremise)
+              .split(/\&+/)
+              .map(function (simplePremise) {
+                var expanded = premise.expand(simplePremise)
+                return Premise.new({
+                  scopeLayer: scope.layer,
+                  scopeId: scope.id,
+                  value: premise.unwrap(expanded)
+                });
+              })
+              .value();
+    }
+
+    function _getConjuctions(premisesValue, scope) {
+      return _.chain(premisesValue)
+              .map(function (premiseValue) {
+                return _getPosibleJoins(premiseValue, premisesValue, scope);
+              })
+              .flattenDeep()
+              .value();
+    }
+
+    function _getPosibleJoins(value, premisesValue, scope) {
+      return _.map(premisesValue, function (premiseValue) {
+        return Premise.new({
+          scopeLayer: scope.layer,
+          scopeId: scope.id,
+          value: value + '&' + premiseValue
+        });
+      });
+    }
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .service('fitchDisjunction', function (Premise) {
+
+    this.elimination = function (premises, scope) {
+      var uniqueConclusions, assumptions, disjunction;
+      assumptions = _getAssumptions(premises.implications);
+      uniqueConclusions = _getUniqueConclusions(premises.implications);
+
+      if(uniqueConclusions.length !== 1) {
+        return null;
+      }
+
+      if(!_isValidOperation(assumptions, premises.disjunctions[0])) {
+        return null;
+      }
+
+      return Premise.new({
+        scopeLayer: scope.layer,
+        scopeId: scope.id,
+        value: uniqueConclusions[0]
+      });
+
+    }
+
+    this.introduction = function (value, selected, scope) {
+      var selectedValues = _.map(selected, function (premise) {
+          return (premise.isCompound())
+                    ? '(' + premise.value + ')'
+                    : premise.value;
+      });
+
+      return _getDisjunctions(value, selectedValues, scope)
+    }
+
+    function _getUniqueConclusions(implications) {
+      return _.chain(implications)
+              .map(function (premise) {
+                  return premise.expand(premise.getConclusion(premise.digest()));
+              })
+              .uniq()
+              .value();
+    }
+
+    function _getAssumptions(implications) {
+      return _.map(implications, function (premise) {
+                   return premise.expand(premise.getAssumption(premise.digest()));
+              });
+    }
+
+    function _getDisjunctions(value, premisesValue, scope) {
+      return _.chain(premisesValue)
+              .map(function (premiseValue) {
+                return _getPosibleJoins([value, premiseValue], scope);
+              })
+              .flattenDeep()
+              .value();
+    }
+
+    function _getPosibleJoins(premisesValue, scope) {
+      var index = premisesValue.length;
+      return _.map(premisesValue, function (premiseValue) {
+        index--;
+        return Premise.new({
+          scopeLayer: scope.layer,
+          scopeId: scope.id,
+          value: premiseValue + '|' + premisesValue[index]
+        });
+      });
+    }
+
+    function _isValidOperation(premises, disjunction) {
+      var structure, assumptions;
+      structure = disjunction.digest();
+      assumptions = premises.slice();
+
+      return _.filter(structure.split(/\|+/), function(label) {
+          return assumptions.indexOf(disjunction.expand(label)) !== -1
+      }).length === premises.length;
+    }
+
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .service('fitchImplication', function (Premise) {
+
+    this.introduction = function(scope, lastScope) {
+      var head, last, digestedHead, digestedLast, assumption, conclusion;
+      head = lastScope.head;
+      last = lastScope.last;
+      digestedHead = head.digest();
+      digestedLast = last.digest();
+
+      assumption = (head.isCompound(head.value))
+                      ? '(' + head.value + ')'
+                      : head.value;
+
+      conclusion = (last.isCompound(last.value))
+                      ? '(' + last.value + ')'
+                      : last.value;
+      
+      if (head.hasNegation(digestedHead) && digestedHead !== head.value) {
+          assumption = head.value;
+      }
+      if (last.hasNegation(digestedLast) && digestedLast !== last.value) {
+          conclusion = last.value;
+      }
+
+      return Premise.new({
+        scopeLayer: scope.layer,
+        scopeId: scope.id,
+        value: assumption + '=>' + conclusion
+      });
+    };
+
+    this.elimination = function(premiseOne, premiseTwo, scope) {
+      var newPremise = eliminate(premiseTwo, premiseOne, scope) || eliminate(premiseOne, premiseTwo, scope);
+      if (!newPremise) {
+        return null;
+      }
+      newPremise.scopeLayer = scope.layer;
+      newPremise.scopeId = scope.id;
+      return newPremise;
+    };
+
+    function eliminate(premiseOne, premiseTwo, scope) {
+      var assumption, conclusion, structure, assumptionNegated;
+      structure = premiseOne.digest();
+      assumption = premiseOne.getAssumption(structure);
+      assumptionNegated = premiseOne.hasNegation(assumption);
+      assumption = premiseOne.expand(assumption);
+      assumption = (assumptionNegated)
+      ? assumption
+      : premiseOne.unwrap(assumption);
+
+  		if (assumption === premiseTwo.value) {
+        conclusion = premiseOne.getConclusion(structure);
+  			return Premise.new({
+  				scopeLayer : scope.layer,
+  				scopeId : scope.id,
+  				value: premiseOne.expand(conclusion)
+  			});
+  		}
+    	return null;
+    }
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .service('fitchNegation', function (Premise) {
+
+    this.introduction = function(premiseOne, premiseTwo, scope) {
+      var newValue;
+
+    	if (!_validImplications(premiseOne, premiseTwo)) {
+  			return null;
+  		}
+  		if (!_validPremises(premiseOne, premiseTwo)) {
+  			return null;
+  		}
+  		if (!_validNegations(premiseOne, premiseTwo)) {
+  			return null;
+  		}
+  		if (!_validConclusions(premiseOne, premiseTwo)) {
+  			return null;
+  		}
+
+      newValue = _getAssumption(premiseOne);
+
+      return Premise.new({
+        scopeLayer: scope.layer,
+        scopeId: scope.id,
+  	    value: '~' + newValue
+      });
+    };
+
+    this.elimination = function(premise, scope) {
+      var structure, newValue, negations;
+      structure = premise.digest();
+      negations = premise.value.match(/^\~+/)[0];
+
+      if (negations.length <= 1) {
+          return;
+      }
+
+      newValue = negations.slice(2) + premise.removeNegation(structure);
+      newValue = (!premise.hasNegation(newValue))
+      ? premise.unwrap(premise.expand(newValue))
+      : premise.expand(newValue);
+
+  		return Premise.new({
+        scopeLayer: scope.layer,
+        scopeId: scope.id,
+        value: newValue
+      });
+  	};
+
+  	function _validImplications(premiseOne, premiseTwo) {
+  		return premiseOne.isImplication() && premiseTwo.isImplication();
+  	}
+
+  	function _validPremises(premiseOne, premiseTwo) {
+  		return _getAssumption(premiseOne) === _getAssumption(premiseTwo);
+  	}
+
+  	function _validNegations(premiseOne, premiseTwo) {
+  		return _validNegation(premiseOne, premiseTwo) || _validNegation(premiseTwo, premiseOne);
+  	}
+
+  	function _validConclusions(premiseOne, premiseTwo) {
+  		return _validConclusion(premiseOne, premiseTwo) || _validConclusion(premiseTwo, premiseOne);
+  	}
+
+  	function _validConclusion(premiseOne, premiseTwo) {
+  		return _getPureConclusion(premiseOne) === _getConclusion(premiseTwo);
+  	}
+
+  	function _validNegation(premiseOne, premiseTwo) {
+      var conclusionOne, conclusionTwo;
+      conclusionOne = _getRawConclusion(premiseOne);
+      conclusionTwo = _getRawConclusion(premiseTwo);
+  		return premiseOne.hasNegation(conclusionOne) && !premiseOne.hasNegation(conclusionTwo);
+  	}
+
+    function _removeNegation(premise) {
+      return premise.replace(/\~+/g,'');
+    }
+
+    function _getAssumption(premise) {
+      var structure, assumption;
+      structure = premise.digest();
+      assumption = premise.getAssumption(structure);
+      return premise.expand(assumption);
+    }
+
+    function _getConclusion(premise) {
+      var structure, conclusion, expanded;
+      structure = premise.digest();
+      conclusion = premise.getConclusion(structure);
+      expanded = premise.expand(_removeNegation(conclusion));
+      return (premise.hasNegation(conclusion))
+      ? '~' + expanded
+      : expanded;
+    }
+
+    function _getPureConclusion(premise) {
+      var structure, conclusion, expanded;
+      structure = premise.digest();
+      conclusion = premise.getConclusion(structure);
+      return premise.expand(_removeNegation(conclusion));
+    }
+
+    function _getRawConclusion(premise, structure) {
+      var structure, conclusion;
+      structure = premise.digest();
+      conclusion = premise.getConclusion(structure);
+      return conclusion;
+    }
+
+});
+
+angular
+  .module('logicToolsApp')
+  .factory('Premise', function() {
+
+    var NEGATION_REGEX, IMPLICATION_REGEX, id;
+    NEGATION_REGEX = /^\~+/;
+    IMPLICATION_REGEX = /[=][>]/g;
+    id = 0;
+
+  	function Premise(props) {
+      this.labels = {};
+      this.id = ++id;
+      this.scopeLayer = props.scopeLayer;
+      this.scopeId = props.scopeId;
+      this.value = _removeSpaces(props.value);
+  	}
+
+    Premise.prototype.digest = function(callback) {
+      var premises, copyPremise, label, labels, value;
+      value = this.value;
+      premises = [];
+      labels = {};
+      label = 0;
+
+      while(premises) {
+        premises = _breakPremise(value);
+        _.each(_extractPremises(value), function(premise) {
+          copyPremise = premise.slice();
+          labels[++label] = _createLabels(labels, copyPremise);
+          value = _reducePremise(value, _unwrap(premise), label);
+          if (callback) {
+              callback(premise, value, label);
+          }
+        });
+      }
+      this.labels = _.assign({}, labels);
+      return value;
+    }
+
+    Premise.prototype.isImplication = function(structrue) {
+  	  var base = structrue || this.value;
+      return !!base.match(IMPLICATION_REGEX);
+    };
+    Premise.prototype.isAnd = function (structrue) {
+      var base = structrue || this.value;
+      return /[&]/g.exec(base);
+    };
+    Premise.prototype.isOr = function (structrue) {
+      var base = structrue || this.value;
+      return /[|]/g.exec(base);
+    };
+    Premise.prototype.isBicon = function (structrue) {
+      var base = structrue || this.value;
+      return /[<][=][>]/g.exec(base);
+    };
+    Premise.prototype.expand = function(premiseLabel) {
+      var premise, indexPremise, labels, symbol;
+      indexPremise = premiseLabel.replace(NEGATION_REGEX, '');
+      labels = this.labels;
+      premise = labels[indexPremise] || this.removeNegation(premiseLabel);
+      symbol = (this.hasNegation(premiseLabel))
+      ? premiseLabel.match(NEGATION_REGEX)[0]
+      : '';
+      return  symbol + _expandPremise(labels, premise);
+    };
+    Premise.prototype.getAssumption = function(structrue) {
+      var base, splited
+      base = structrue || this.value;
+      splited = _splitImplication(base);
+      return (splited) ? splited[0] : undefined;
+    };
+    Premise.prototype.getConclusion = function(structrue) {
+      var base, splited
+      base = structrue || this.value;
+      splited = _splitImplication(base);
+      return (splited) ? splited[1] : undefined;
+    };
+    Premise.prototype.getExpandedAssumption = function(structrue) {
+      var base, splited
+      base = structrue || this.value;
+      splited = _splitImplication(base);
+      return (splited) ? this.expand(splited[0]) : undefined;
+    };
+    Premise.prototype.getExpandedConclusion = function(structrue) {
+      var base, splited
+      base = structrue || this.value;
+      splited = _splitImplication(base);
+      return (splited) ? this.expand(splited[1]) : undefined;
+    };
+    Premise.prototype.getPrimitives = function(structrue) {
+      var base = structrue || this.value;
+      return base.match(/\w+/g);
+    }
+    Premise.prototype.removeNegation = function(structrue) {
+      var base = structrue || this.value;
+      return base.replace(NEGATION_REGEX, '');
+    }
+    Premise.prototype.hasNegation = function(structrue) {
+      var base = structrue || this.value;
+      return !!base.match(NEGATION_REGEX);
+    }
+    Premise.prototype.isCompound = function(structrue) {
+      var base = structrue || this.value;
+      return !!base.match(/[<=>|&]+/);
+    }
+    Premise.prototype.unwrap = function (value) {
+      return _unwrap(value || this.value);
+    };
+
+    function _breakPremise(value) {
+      return value.match(/[(]{1}[\w~<=>|&]+(?=[)]{1})[)]{1}/g);
+    }
+
+    function _createLabels (labels, premise) {
+      var createdLabels;
+      createdLabels = _.keys(labels);
+      return Array.prototype.map.call(premise, function(val, k) {
+          return (createdLabels.indexOf(val) !== -1) ? labels[val] : val;
+      }).join('');
+    }
+
+    function _extractPremises(premise) {
+      return (_breakPremise(premise)) ? _breakPremise(premise) : [premise];
+    }
+
+    function _reducePremise(premise, subPremise, label) {
+      var matchExpr;
+      subPremise = subPremise.replace(/[|]/g, '[|]'); //This is special for the 'or' character.
+      matchExpr = new RegExp('[(]' + subPremise + '[)]', 'g');
+      return premise.replace(matchExpr, label);
+    }
+
+    function _expandPremise(labels, value) {
+      var premiseValue, labelsKeys, symbol;
+      premiseValue = value.slice();
+      labelsKeys = _.keys(labels);
+      return _.map(labelsKeys, function(label) {
+                premiseValue = premiseValue.replace(label, labels[label]);
+                return premiseValue;
+            }).slice(-1)[0];
+    }
+
+    function _splitImplication(value) {
+        return value.split(IMPLICATION_REGEX);
+    }
+
+    function _unwrap(value) {
+      var unwraped;
+      if (!value) {
+        return undefined;
+      }
+      unwraped = value.match(/[(]{1}([\w\W]+)[)]{1}/);
+      return (unwraped) ? unwraped[1] : value;
+    }
+
+    function _removeSpaces(value) {
+      return value.replace(/\s+/g,'');
+    }
+
+    return {
+      new: function(props) {
+        return new Premise(props);
+      }
+    }
+
+  });
+
+'use strict';
+
+angular
+  .module('logicToolsApp')
+  .service('tableGenerator', function(Premise, Table) {
+
+    var basePremise, table;
+    this.generate = function(premise) {
+      var premises, atomicPremises;
+      premises = [];
+      this.premise = premise;
+      basePremise = Premise.new({
+          value: premise
+      });
+      table = Table.new();
+      reset.call(this);
+      atomicPremises = _getAtomicPremises(premise);
+      this.value = _buildAtomicColumn(atomicPremises);
+      this.value = _.assign({}, this.value, _buildCompoundColumn(this.value));
+      this.labels = basePremise.labels;
+    };
+
+    function reset() {
+      this.value = {};
+      this.labels = {};
+    }
+
+    reset.call(this);
+
+    function _getAtomicPremises(premise) {
+      return _.uniq(premise.match(/[^~<=>()&|\s]/g));
+    }
+    function _buildAtomicValues(value, key) {
+      var columns, column, rows;
+      columns = _.keys(value);
+      rows = Math.pow(2, columns.length);
+      column = 0;
+      return _.mapValues(value, function (value, key) {
+        return table.getAtomicValue(++column, rows);
+      });
+    }
+    function _buildAtomicColumn(atomicPremises) {
+      var initialPremises, premisesValues;
+      initialPremises = {};
+      _.forEach(atomicPremises, function (premise, key) {
+          initialPremises[premise] = [];
+          premisesValues = _buildAtomicValues(initialPremises, key);
+      });
+      return premisesValues;
+    }
+    function _buildCompoundColumn(tableValue) {
+      var values;
+      values = _.assign({}, tableValue);
+      basePremise.digest(function(premise, value, label) {
+          values[label] = table.getCompoundValue(premise, label, values);
+      });
+      return values;
+    }
+  });
+
+angular
+  .module('logicToolsApp')
+  .factory('Table', function(formula) {
+
+    function Table () {}
+
+    Table.prototype.getCompoundValue = function(premise, key, tableValue) {
+      var ca, cb, c, a, b, getFormula, atomics, values;
+      getFormula = formula.resultFn(premise);
+      atomics = premise.match(/\w+|[~]+\w|\d+|[~]+\d/g);
+      values = [];
+      ca = _negateColumn(tableValue, atomics[0]);
+      cb = _negateColumn(tableValue, atomics[1]);
+      c = 0;
+      while (ca.length > c) {
+          a = ca[c];
+          b = cb[c];
+          values.push(Number(getFormula(a, b)));
+          c++;
+      }
+      return values;
+    }
+
+    Table.prototype.getAtomicValue = function(nCol, nRows) {
+      var values, value, row, nchange, sumup;
+      values = [];
+      value = 0;
+      row = 1;
+      sumup = 1;
+      nchange = Math.pow(2, nCol);
+      while (row <= nRows) {
+          if (((1 / nchange) * nRows) * sumup < row) {
+              value = 1 - value;
+              sumup++;
+          }
+          values.push(value);
+          row++;
+      }
+      return values;
+    }
+
+    function _negateColumn(value, premise) {
+      /*Negate if negation exists*/
+      var negation, result, atomic, operator;
+      negation = premise.match(/[~]/g);
+      atomic = premise.match(/\w+/g);
+      if (negation) {
+          result = _.map(value[atomic[0]], function(val, key) {
+              operator = negation.join('').replace(/[~]/g, '!');
+              return Number(eval(operator + val));
+          });
+      } else {
+          result = value[atomic[0]];
+      }
+      return result;
+    }
+
+		return {
+			new: function() {
+				return new Table();
+			}
+		}
+
+  });
+
 //# sourceMappingURL=maps/base.js.map
