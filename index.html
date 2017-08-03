@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Logic Tools</title>
+  <link rel="stylesheet" href="dist/vendor.css" />
+  <link rel="stylesheet" href="dist/base.css">
+</head>
+<body ng-app="logicToolsApp">
+  <header class="header">
+    <div ng-controller="MenuCtrl as menu" ng-include src="'templates/menu.html'"></div>
+  </header>
+
+  <div class="container">
+    <div ui-view=""></div>
+  </div>
+
+  <script src="dist/vendor.js"></script>
+  <script src="dist/base.js"></script>
+</body>
+</html>
