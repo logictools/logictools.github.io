@@ -1,0 +1,36 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3>Logic toolbox</h3>
+  </div>
+  <div class="panel-body">
+    <p class="text-primary">Choose the tool that you want to use according to your study area</p>
+    <div class="row">
+      <p class="main-title text-info"> - Propositional Logic</p>
+      <div class="col-sm-6">
+        <button class="btn btn-info" ng-click="main.goToTruth()">Truth tables</button>
+      </div>
+      <div class="col-sm-6">
+        <button class="btn btn-info" ng-click="main.goToFitch()">Fitch Resolution</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="row">
+        <div class="col-sm-7 col-sm-offset-2">
+            <div class="list-group">
+                <div class="list-group-item list-group-item-danger">
+                    <h4>
+                      <strong class="glyphicon glyphicon-info-sign"></strong> 
+                      <strong>Syntax rules to create a premise</strong>
+                    </h4>
+                    Don't forget to wrap compound premises in parentheses when you create more than one (like in the example)
+                </div>
+                <div class="list-group-item"><strong>Negation: ~ </strong></div>
+                <div class="list-group-item"><strong>And: & </strong></div>
+                <div class="list-group-item"><strong>Or: | </strong></div>
+                <div class="list-group-item"><strong>Implication: => </strong></div>
+                <div class="list-group-item"><strong>Biconditional: <=></strong></div>
+                <div class="list-group-item"><strong>Example: ~(p&q)=>(~p|~q) </strong></div>
+            </div>
+        </div>
+    </div>
