@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Logic Tools</title>
-  <link rel="stylesheet" href="dist/vendor.css" />
-  <link rel="stylesheet" href="dist/base.css">
+  <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body ng-app="logicToolsApp">
   <header class="header">
@@ -17,7 +17,31 @@
     <div ui-view=""></div>
   </div>
 
-  <script src="dist/vendor.js"></script>
-  <script src="dist/base.js"></script>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+  <script src="bower_components/lodash/lodash.js"></script>
+
+  <!--App files-->
+  <script src="js/app.js"></script>
+  <script src="js/controllers/main.controller.js"></script>
+  <script src="js/controllers/fitch.controller.js"></script>
+  <script src="js/controllers/truth-table.controller.js"></script>
+  <script src="js/controllers/menu.controller.js"></script>
+
+  <script src="js/services/fitch/fitch-stack.model.js"></script>
+  <script src="js/services/fitch/rules/bicondition.service.js"></script>
+  <script src="js/services/fitch/rules/conjunction.service.js"></script>
+  <script src="js/services/fitch/rules/disjunction.service.js"></script>
+  <script src="js/services/fitch/rules/negation.service.js"></script>
+  <script src="js/services/fitch/rules/implication.service.js"></script>
+  <script src="js/services/fitch/premise-tree.model.js"></script>
+  <script src="js/services/fitch/scope.model.js"></script>
+  <script src="js/services/syntax.service.js"></script>
+  <script src="js/services/formula.service.js"></script>
+  <script src="js/services/premise/premise.model.js"></script>
+  <script src="js/services/tables/table.model.js"></script>
+  <script src="js/services/tables/table-generator.service.js"></script>
 </body>
 </html>
