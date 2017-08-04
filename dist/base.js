@@ -57,6 +57,7 @@ angular
         headPremise.scopeLayer = currentScope.layer;
         this.premiseGraph.appendNode(headPremise);
         this.premise = '';
+        console.log(this.premiseGraph);
       };
 
       this.refresh = function () {
