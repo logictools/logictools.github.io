@@ -40,23 +40,33 @@ angular
 
       _init.call(this);
 
+      this.createPremises = function() {
+        var splitedPremises, emptyHistory;
+        splitedPremises = _getInitialPremises(this.initialPremises);
+        _appendInitialPremises(_createInitialPremises(splitedPremises), this.structure, this.premiseGraph);
+        emptyHistory = splitedPremises.map(function(premise) {
+          return '';
+        });
+        this.history = this.history.concat(emptyHistory);
+        this.initialPremises = '';
+      };
+
       this.assume = function() {
         var currentScope, labels, headPremise;
 
         headPremise = Premise.new({
-          value: this.premise
+          value: this.premise,
+          productOf: 'Assumption'
         });
 
         if (!syntaxChecker.validate(headPremise)) {
           return;
         }
-
-        this.structure.openScope(headPremise);
-        currentScope = this.structure.getCurrentScope();
-        headPremise.scopeId = currentScope.id;
-        headPremise.scopeLayer = currentScope.layer;
-        this.premiseGraph.appendNode(headPremise);
+        _openStructureScope(headPremise, this.structure, this.premiseGraph);
         this.premise = '';
+        this.isAssumptionVisible = false;
+        this.isPremiseVisible = false;
+        this.history.push('Assumption');
       };
 
       this.refresh = function () {
@@ -83,6 +93,7 @@ angular
             return;
         }
         _multipleEntialment.call(this, newPremises, selected);
+        this.history.push('Or. Int.');
       };
 
       /*Operations*/
@@ -99,6 +110,7 @@ angular
           return;
         }
         _multipleEntialment.call(this, newPremises, selected);
+        this.history.push('And Int.');
       };
       this.andElimination = function () {
         var selected, newPremises, secondPremise, currentScope;
@@ -195,7 +207,8 @@ angular
                             return Premise.new({
                                 scopeLayer: currentScope.layer,
                                 scopeId: currentScope.id,
-                                value: premise.value
+                                value: premise.value,
+                                productOf: 'Reiteration'
                             });
                         });
         _.forEach(reiterated, function (premise) {
@@ -204,10 +217,11 @@ angular
         _uncheckPremises(this.premiseGraph.premises, this.selected);
       };
       this.delete = function () {
-        var selected, scopeIds;
+        var selected, scopeIds, selectedIndex, removedPremises;
         selected = _getSelectedPremises(this.premiseGraph.premises);
         _.forEach(selected, function (premise) {
-          this.premiseGraph.removeNode(premise);
+          selectedIndex = this.premiseGraph.premises.indexOf(premise);
+          removedPremises = this.premiseGraph.removeNode(premise);
         }.bind(this));
         scopeIds = _.map(this.premiseGraph.premises, 'scopeId');
         this.structure.reset(this.premiseGraph.premises);
@@ -225,6 +239,7 @@ angular
           return;
         }
         _multipleEntialment.call(this, newPremises, selected);
+        this.history.push('Bic. Int.');
       }
       this.biconditionalElim = function () {
         var selected, newPremises, secondPremise, currentScope;
@@ -239,18 +254,64 @@ angular
           return;
         }
         _multipleEntialment.call(this, newPremises, selected);
+        this.history.push('Bic. Int.');
       }
 
       /*Local functions*/
       function _init() {
+        this.isAssumptionVisible = false;
+        this.history = [];
         this.marginLeft = 20; //pixels
         this.premise = '';
+        this.isPremiseVisible = true;
         this.premiseGraph = PremiseTree.new();
         this.selected = [];
         this.showDisjoinField = false;
         this.structure = FitchStack.new();
         this.valueToDisjoin = '';
+        this.initialPremises = '';
       }
+
+      function _getInitialPremises(premiseString) {
+        return premiseString.split(/\,/g);
+      }
+
+      function _createInitialPremises(premises) {
+        return _.map(premises, function(premise) {
+          return Premise.new({
+            value: premise
+          });
+        });
+      }
+
+      function _openStructureScope (premise, structure, premiseGraph, holdLayer) {
+        var currentScope;
+        structure.openScope(premise, holdLayer);
+        currentScope = structure.getCurrentScope();
+        premise.scopeId = currentScope.id;
+        premise.scopeLayer = currentScope.layer;
+        premiseGraph.appendNode(premise);
+      }
+
+      function _insertToScope (premise, structure, premiseGraph) {
+        var currentScope;
+        structure.entail(premise);
+        currentScope = structure.getCurrentScope();
+        premise.scopeId = currentScope.id;
+        premise.scopeLayer = currentScope.layer;
+        premiseGraph.appendNode(premise);
+      }
+
+      function _appendInitialPremises(premises, structure, premiseGraph) {
+        premises.forEach(function(premise, index){
+          if (index <= 0) {
+            _openStructureScope(premise, structure, premiseGraph, true);
+          } else {
+            _insertToScope (premise, structure, premiseGraph)
+          }
+        });
+      }
+
       function _entail(premise, parentPremises) {
         this.structure.entail(premise);
         _appendPremiseChild(this.premiseGraph, premise, parentPremises);
@@ -302,9 +363,9 @@ angular
         };
       }
 
-      function _appendPremiseChild(structrue, childPremise, parentPremises) {
+      function _appendPremiseChild(premiseGraph, childPremise, parentPremises) {
         _.forEach(parentPremises, function (premise) {
-          structrue.appendChildNode(premise, childPremise);
+          premiseGraph.appendChildNode(premise, childPremise);
         });
       }
 
@@ -326,7 +387,7 @@ angular
 
 angular.module('logicToolsApp')
   .controller('MenuCtrl', function () {
-
+    
   });
 
 'use strict';
@@ -397,10 +458,10 @@ angular
       return removedScope[0];
     };
 
-    FitchStack.prototype.openScope = function(headAssumption) {
+    FitchStack.prototype.openScope = function(headAssumption, holdLayer) {
       var scope = Scope.new({
         head: headAssumption,
-        layer: ++scopeLayer
+        layer: (holdLayer) ? scopeLayer : ++scopeLayer
       });
 
       if (this.scopes.length) {
@@ -457,7 +518,7 @@ angular
                       });
                     })
                     .value();
-      return _.find(scopes, {layer: 0})
+      return _.find(scopes, {layer: 0}) 
                   ? scopes
                   : [universalScope].concat(scopes);
     }
@@ -759,7 +820,7 @@ angular
     function _emptyPremise(premise) {
       return !premise.value;
     }
-
+    
   });
 
 angular
@@ -810,7 +871,8 @@ angular
         return Premise.new({
           scopeLayer: scope.layer,
           scopeId: scope.id,
-          value: premise.expand(atomicPremise) + '=>' + premise.expand(atomics[index])
+          value: premise.expand(atomicPremise) + '=>' + premise.expand(atomics[index]),
+          productOf: 'Bicon Elm.'
         });
       });
     }
@@ -820,7 +882,8 @@ angular
         return Premise.new({
           scopeLayer: scope.layer,
           scopeId: scope.id,
-          value: premise.getExpandedConclusion(value) + '<=>' + premise.getExpandedAssumption(value)
+          value: premise.getExpandedConclusion(value) + '<=>' + premise.getExpandedAssumption(value),
+          productOf: 'Bicon Int.'
         })
       });
     }
@@ -846,7 +909,8 @@ angular
                 return Premise.new({
                   scopeLayer: scope.layer,
                   scopeId: scope.id,
-                  value: premise.unwrap(expanded)
+                  value: premise.unwrap(expanded),
+                  productOf: 'And Elm.'
                 });
               })
               .value();
@@ -866,7 +930,8 @@ angular
         return Premise.new({
           scopeLayer: scope.layer,
           scopeId: scope.id,
-          value: value + '&' + premiseValue
+          value: value + '&' + premiseValue,
+          productOf: 'And Int.'
         });
       });
     }
@@ -894,7 +959,8 @@ angular
       return Premise.new({
         scopeLayer: scope.layer,
         scopeId: scope.id,
-        value: uniqueConclusions[0]
+        value: uniqueConclusions[0],
+        productOf: 'Or Elm.'
       });
 
     }
@@ -940,7 +1006,8 @@ angular
         return Premise.new({
           scopeLayer: scope.layer,
           scopeId: scope.id,
-          value: premiseValue + '|' + premisesValue[index]
+          value: premiseValue + '|' + premisesValue[index],
+          productOf: 'Or Int.'
         });
       });
     }
@@ -977,7 +1044,7 @@ angular
       conclusion = (last.isCompound(last.value))
                       ? '(' + last.value + ')'
                       : last.value;
-
+      
       if (head.hasNegation(digestedHead) && digestedHead !== head.value) {
           assumption = head.value;
       }
@@ -988,7 +1055,8 @@ angular
       return Premise.new({
         scopeLayer: scope.layer,
         scopeId: scope.id,
-        value: assumption + '=>' + conclusion
+        value: assumption + '=>' + conclusion,
+        productOf: 'Imp Int.'
       });
     };
 
@@ -1017,7 +1085,8 @@ angular
   			return Premise.new({
   				scopeLayer : scope.layer,
   				scopeId : scope.id,
-  				value: premiseOne.expand(conclusion)
+  				value: premiseOne.expand(conclusion),
+          productOf: 'Imp Elm.'
   			});
   		}
     	return null;
@@ -1051,7 +1120,8 @@ angular
       return Premise.new({
         scopeLayer: scope.layer,
         scopeId: scope.id,
-  	    value: '~' + newValue
+  	    value: '~' + newValue,
+        productOf: 'Neg Int.'
       });
     };
 
@@ -1072,7 +1142,8 @@ angular
   		return Premise.new({
         scopeLayer: scope.layer,
         scopeId: scope.id,
-        value: newValue
+        value: newValue,
+        productOf: 'Neg Elm.'
       });
   	};
 
@@ -1155,6 +1226,7 @@ angular
       this.scopeLayer = props.scopeLayer;
       this.scopeId = props.scopeId;
       this.value = _removeSpaces(props.value);
+      this.productOf = props.productOf || '';
   	}
 
     Premise.prototype.digest = function(callback) {

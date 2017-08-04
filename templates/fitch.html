@@ -7,7 +7,11 @@
         <div class="fitch-premise-row">
           <div class="fitch-premise-value"
                ng-class="{'universal-scope': !premise.scopeLayer}"
-               ng-style="{'margin-left':fitch.marginLeft * premise.scopeLayer}">{{premise.value}}</div>
+               ng-style="{'margin-left':fitch.marginLeft * premise.scopeLayer}">{{premise.value}}
+          </div>
+          <div class="history-section text-muted">
+              {{premise.productOf}}
+          </div>
         </div>
     </div>
 </div>
@@ -17,25 +21,43 @@
       Fitch
     </div>
     <div class="panel-body">
-      <div class="col-sm-offset-3">
-      <strong class="text-info">Enter your assupmtion here:</strong>
-      </div>
-      <div class="assumption-section">
-          <div class="col-sm-6 col-md-offset-2">
+      <div class="row premises-section">
+          <div class="col-sm-7 col-sm-offset-2" ng-if="fitch.isPremiseVisible">
+              <strong class="text-info">Enter your premises separated by coma:</strong>
               <div class="input-group">
-                  <input type="text" class="form-control" placeholder="e.g. ~(p&q)=>(~p|~q)" ng-model="fitch.premise" />
-                  <span class="input-group-btn">
-                      <button class="btn btn-info" ng-click="fitch.assume()">
-                        Add
-                        <span class="glyphicon glyphicon-plus add-icon"></span>
-                      </button>
-                  </span>
+                <input type="text" class="form-control" placeholder="e.g. ~(p&q), ~q" ng-model="fitch.initialPremises" />
+                <span class="input-group-btn">
+                    <button class="btn btn-info" ng-click="fitch.createPremises()">
+                        Enter
+                    </button>
+                </span>
               </div>
           </div>
-          <div class="col-sm-3 col-md-offset-1 refresh-section">
-            Refresh
-            <span class="glyphicon glyphicon-refresh refresh-button" ng-click="fitch.refresh()"></span>
-          </div>
+      </div>
+      <div class="row">
+        <div class="assumption-section">
+            <div class="col-sm-7 col-md-offset-2" ng-if="fitch.isAssumptionVisible">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="e.g. ~(p&q)=>(~p|~q)" ng-model="fitch.premise" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info" ng-click="fitch.assume()">
+                            Add
+                            <span class="glyphicon glyphicon-plus add-icon"></span>
+                        </button>
+                        <button class="btn btn-danger" ng-click="fitch.isAssumptionVisible = false;">
+                            Cancel
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-5 col-md-offset-3" ng-if="!fitch.isAssumptionVisible">
+                <button class="list-group-item fitch-single-operation" ng-click="fitch.isAssumptionVisible = true;">Make Assumption</button>
+            </div>
+            <div class="col-sm-3 refresh-section">
+                Refresh
+                <span class="glyphicon glyphicon-refresh refresh-button" ng-click="fitch.refresh()"></span>
+            </div>
+        </div>
       </div>
       <div class="row fitch-operations">
           <div class="list-group fitch-group-operations col-md-4 col-sm-12">
