@@ -57,7 +57,6 @@ angular
         headPremise.scopeLayer = currentScope.layer;
         this.premiseGraph.appendNode(headPremise);
         this.premise = '';
-        console.log(this.premiseGraph);
       };
 
       this.refresh = function () {
@@ -327,7 +326,7 @@ angular
 
 angular.module('logicToolsApp')
   .controller('MenuCtrl', function () {
-    
+
   });
 
 'use strict';
@@ -458,7 +457,7 @@ angular
                       });
                     })
                     .value();
-      return _.find(scopes, {layer: 0}) 
+      return _.find(scopes, {layer: 0})
                   ? scopes
                   : [universalScope].concat(scopes);
     }
@@ -760,7 +759,7 @@ angular
     function _emptyPremise(premise) {
       return !premise.value;
     }
-    
+
   });
 
 angular
@@ -978,7 +977,7 @@ angular
       conclusion = (last.isCompound(last.value))
                       ? '(' + last.value + ')'
                       : last.value;
-      
+
       if (head.hasNegation(digestedHead) && digestedHead !== head.value) {
           assumption = head.value;
       }
