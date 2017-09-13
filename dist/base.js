@@ -194,7 +194,7 @@ angular
         if (!newPremise) {
           return;
         }
-        _entail.call(this, newPremise, groupedPremises);
+        _entail.call(this, newPremise, groupedPremises.disjunctions.concat(groupedPremises.implications));
       };
       this.orIntroduction = function () {
         this.showDisjoinField = true;
